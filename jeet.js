@@ -10,7 +10,7 @@ var compass = require('compass');
 var sync = require('synchronize');
 var liveReload = require('livereload');
 
-app.version('0.1.2');
+app.version('0.1.3');
 
 app.command('create <app_name>').description("Create a new Jeet app").action(function(app_name) {
 	terminal.colorize("\n%W%0%UCreating " + app_name + "%n\n");
