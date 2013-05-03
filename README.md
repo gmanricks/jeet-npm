@@ -1,4 +1,5 @@
-jeet-npm
-========
+Jeet Framework
 
-The NPM package for Jeet open sourced for educational purposes
+Website/Docs: http://jeetframework.com/
+
+Github: https://github.com/CorySimmons/jeet
