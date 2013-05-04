@@ -10,7 +10,7 @@ var compass = require('compass');
 var sync = require('synchronize');
 var liveReload = require('livereload');
 
-app.version('0.2.0-2');
+app.version('0.3.0');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
