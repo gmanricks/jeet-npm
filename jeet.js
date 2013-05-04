@@ -12,6 +12,9 @@ var liveReload = require('livereload');
 
 app.version('0.2.0-2');
 
+app.option('-t, --stylus', 'Only use Stylus');
+app.option('-c, --scss', 'Only use SCSS');
+
 app.command('create <app_name>').description("Create a new Jeet app").action(function(app_name) {
 	terminal.colorize("\n%W%0%UCreating " + app_name + "%n\n");
 	terminal.write("    Downloading Repo ... ");
@@ -34,7 +37,7 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	compileSCSS(cssPath);
 	var server = liveReload.createServer({ port: 35729, exts: ['css', 'html']});
 	server.watch(cssPath.substr(0, cssPath.length-4));
-	if (fs.existsSync(cssPath + "scss")) {
+	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
 		fs.watch(cssPath + "scss", function(e, filename){
 			if (filename.indexOf(".scss") !== -1) {		
 				compileSCSS(cssPath);
@@ -42,7 +45,7 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 		});
 	}
 	
-	if (fs.existsSync(cssPath + "styl")) {
+	if (fs.existsSync(cssPath + "styl") && !app.scss) {
 		fs.watch(cssPath + "styl", function(e, filename){
 			if (filename.indexOf(".styl") !== -1) {			
 				compileStylus(cssPath);
@@ -72,6 +75,9 @@ function getCssPath () {
 }
 
 function compileSCSS (cssPath) {
+	if (app.stylus) {
+		return;
+	}
 	var scssFile = "";
 	if (fs.existsSync(cssPath + "scss/style.scss")) {
 		scssFile = cssPath + "scss/style.scss";
@@ -81,23 +87,31 @@ function compileSCSS (cssPath) {
 		//No Scss style file
 		return;
 	}
-	
-	terminal.write("    Compiling SCSS ... ");
-	sync(compass, 'compile');
-	sync.fiber(function(){ compass.compile({cwd: cssPath + "scss"}); });
-	terminal.color("green").write("OK!").reset().write("\n");
+	compass.compile({cwd: cssPath + "scss"}, function(err) {
+		var message = "    Compiling SCSS ... ";
 
-	terminal.write("    Saving Compiled SCSS ... ");
-	if (fs.existsSync(cssPath + "style.css")) {
-		fs.renameSync(cssPath + "style.css", cssPath + "scss/style_scss.css");
-	}
-	if (fs.existsSync(cssPath + "style_scss.css")) {
-		fs.renameSync(cssPath + "style_scss.css", cssPath + "scss/style_scss.css");
-	}						
-	terminal.color("green").write("OK!").reset().write("\n\n");	
+		if (err) {
+			message += "%rError!%n\n\n";		
+		} else {
+			message += "%gOK!%n\n";
+			message += "    Saving Compiled SCSS ... ";
+			if (fs.existsSync(cssPath + "style.css")) {
+				fs.renameSync(cssPath + "style.css", cssPath + "scss/style_scss.css");
+			}
+			if (fs.existsSync(cssPath + "style_scss.css")) {
+				fs.renameSync(cssPath + "style_scss.css", cssPath + "scss/style_scss.css");
+			}						
+			message += "%gOK!%N \n\n";	
+		}
+		
+		terminal.colorize(message);
+	}); 
 }
 
 function compileStylus (cssPath) {
+	if (app.scss) {
+		return;
+	}
 	var stylFile = "";
 	if (fs.existsSync(cssPath + "styl/style.styl")) {
 		stylFile = cssPath + "styl/style.styl";
@@ -110,12 +124,16 @@ function compileStylus (cssPath) {
 	
 	terminal.write("    Compiling Stylus ... ");
 	var styleFile = fs.readFileSync(stylFile);
-	styleFile = stylus(styleFile.toString()).set('paths', [cssPath + "styl"]).use(nib()).render();
-	terminal.color("green").write("OK!").reset().write("\n");
-
-	terminal.write("    Saving Compiled Stylus ... ");
-	fs.writeFileSync(cssPath + "styl/style_styl.css", styleFile);
-	terminal.color("green").write("OK!").reset().write("\n\n");
+	try {
+		styleFile = stylus(styleFile.toString()).set('paths', [cssPath + "styl"]).use(nib()).render();
+		terminal.color("green").write("OK!").reset().write("\n");
+	
+		terminal.write("    Saving Compiled Stylus ... ");
+		fs.writeFileSync(cssPath + "styl/style_styl.css", styleFile);
+		terminal.color("green").write("OK!").reset().write("\n\n");
+	} catch (e) {
+		terminal.color("red").write("Error!").reset().write("\n\n");
+	}
 }
 
 //Function Thanks to geedew on SO
