@@ -38,16 +38,36 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	compileSCSS(cssPath);
 	startLiveReload(cssPath)
 	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
+		var scssFilesArr = fs.readdirSync(cssPath + "scss");
+		for (var i = 0; i < scssFilesArr.length; i++) {
+			if (fs.statSync(cssPath + "scss/" + scssFilesArr[i]).isDirectory()) {
+				fs.watch(cssPath + "scss/" + scssFilesArr[i], function(e, filename){
+					if (filename.substr(-5) === ".scss") {			
+						compileSCSS(cssPath);
+					}
+				});
+			}
+		}
 		fs.watch(cssPath + "scss", function(e, filename){
-			if (filename.indexOf(".scss") !== -1) {		
+			if (filename.substr(-5) === ".scss") {		
 				compileSCSS(cssPath);
 			}
 		});
 	}
 	
 	if (fs.existsSync(cssPath + "styl") && !app.scss) {
+		var stylFilesArr = fs.readdirSync(cssPath + "styl");
+		for (var i = 0; i < stylFilesArr.length; i++) {
+			if (fs.statSync(cssPath + "styl/" + stylFilesArr[i]).isDirectory()) {
+				fs.watch(cssPath + "styl/" + stylFilesArr[i], function(e, filename){
+					if (filename.substr(-5) === ".styl") {			
+						compileStylus(cssPath);
+					}
+				});
+			}
+		}
 		fs.watch(cssPath + "styl", function(e, filename){
-			if (filename.indexOf(".styl") !== -1) {			
+			if (filename.substr(-5) === ".styl") {			
 				compileStylus(cssPath);
 			}
 		});
