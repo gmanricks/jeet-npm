@@ -9,8 +9,9 @@ var nib = require('nib');
 var compass = require('compass');
 var sync = require('synchronize');
 var liveReload = require('livereload');
+var net = require('net');
 
-app.version('0.2.0-2');
+app.version('0.2.0-3');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
@@ -35,8 +36,7 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	terminal.colorize("\n%W%0%UWatching App%n\n");
 	compileStylus(cssPath);
 	compileSCSS(cssPath);
-	var server = liveReload.createServer({ port: 35729, exts: ['css', 'html']});
-	server.watch(cssPath.substr(0, cssPath.length-4));
+	startLiveReload(cssPath)
 	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
 		fs.watch(cssPath + "scss", function(e, filename){
 			if (filename.indexOf(".scss") !== -1) {		
@@ -58,6 +58,39 @@ app.parse(process.argv);
 
 
 //Helper Functions
+
+//Function by timoxley on https://gist.github.com/timoxley/1689041
+function isPortTaken (PORT, callback) {
+  var tester = net.createServer()
+  tester.once('error', function (err) {
+    if (err.code == 'EADDRINUSE') {
+      callback(null, true)
+    } else {
+      callback(err)
+    }
+  })
+  tester.once('listening', function() {
+    tester.once('close', function() {
+      callback(null, false)
+    })
+    tester.close()
+  })
+  tester.listen(PORT)
+}
+
+function startLiveReload(cssPath) {
+	isPortTaken(35729, function (err, taken) {
+		if (!err && !taken) {	
+			var server = liveReload.createServer({ port: 35729, exts: ['css', 'html']});
+			server.watch(cssPath.substr(0, cssPath.length-4));
+		} else if (!err && taken) {
+			terminal.color("red").write("    The live-reload port seems to be in use by another app, so live-reload will be turned off").reset().write("\n\n");
+		} else {
+			terminal.color("red").write(err).reset().write("\n\n");
+			process.kill();	
+		}
+	});
+}
 
 function getCssPath () {
 	var cssPath = process.cwd();
