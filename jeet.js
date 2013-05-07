@@ -11,7 +11,7 @@ var sync = require('synchronize');
 var liveReload = require('livereload');
 var net = require('net');
 
-app.version('0.3.0');
+app.version('0.3.1');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
