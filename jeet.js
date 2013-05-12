@@ -35,7 +35,7 @@ app.command('create <app_name>').description("Create a new Jeet app").action(fun
 app.command('watch').description("Watch the current path and recompile CSS on changes").action(function(){
 	var rootPath = getRootPath();
 	cssPath = rootPath + "css/";
-	terminal.colorize("\n%W%0%UWatching App%n\n");
+	terminal.colorize("\n%W%0%UWatching App%n\n\n");
 	compileStylus(cssPath);
 	compileSCSS(cssPath);
 	startLiveReload(cssPath)
@@ -107,12 +107,12 @@ function isPortTaken (PORT, callback) {
   tester.listen(PORT)
 }
 
-function startLiveReload(cssPath) {
+function startLiveReload() {
 	isPortTaken(35729, function (err, taken) {
 		if (!err && !taken) {	
 			tinylr().listen(35729, function(){
 				livereload = true;
-				terminal.color("green").write("    Live Reload is on and listening !").reset().write("\n\n");   
+				terminal.color("green").write("    Live Reload is on and listening !").reset().write("\n");   
 			});
 			//var server = liveReload.createServer({ port: 35729, exts: ['css', 'html']});
 			//server.watch(cssPath.substr(0, cssPath.length-4));
@@ -128,7 +128,7 @@ function startLiveReload(cssPath) {
 function getRootPath () {
 	var rootPath = process.cwd();
 	if (fs.existsSync(rootPath + "/styl") || fs.existsSync(rootPath + "/scss")) {
-		rootPath = rootPath.substr(0, -3);
+		rootPath = rootPath.substr(0, rootPath.length - 3);
 	} else if (fs.existsSync(rootPath + "/css/styl") || fs.existsSync(rootPath + "/css/scss")) {
 		rootPath += "/";
 	} else if (fs.existsSync(rootPath + "/web/css/styl") || fs.existsSync(rootPath + "/web/css/scss")) {
@@ -154,7 +154,13 @@ function compileSCSS (cssPath) {
 		return;
 	}
 	compass.compile({cwd: cssPath + "scss"}, function(err) {
-		var message = "    Compiling SCSS ... ";
+		var message = "";
+	
+		if (livereload) {
+			message += "\n";
+		}
+
+		message += "    Compiling SCSS ... ";
 
 		if (err) {
 			message += "%rError!%n\n\n";		
@@ -190,7 +196,9 @@ function compileStylus (cssPath) {
 		//No STYL style file
 		return;
 	}
-	
+	if (livereload) {
+		terminal.write("\n");
+	}
 	terminal.write("    Compiling Stylus ... ");
 	var styleFile = fs.readFileSync(stylFile);
 	try {
