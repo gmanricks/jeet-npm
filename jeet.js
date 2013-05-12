@@ -178,7 +178,7 @@ function compileStylus (cssPath) {
 	terminal.write("    Compiling Stylus ... ");
 	var styleFile = fs.readFileSync(stylFile);
 	try {
-		styleFile = stylus(styleFile.toString()).set('paths', [cssPath + "styl"]).use(nib()).render();
+		styleFile = stylus(styleFile.toString()).set('paths', [cssPath + "styl"]).set('compress', true).use(nib()).render();
 		terminal.color("green").write("OK!").reset().write("\n");
 	
 		terminal.write("    Saving Compiled Stylus ... ");
