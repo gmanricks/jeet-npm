@@ -13,7 +13,7 @@ var tinylr = require('tiny-lr');
 
 
 var livereload = false;
-app.version('0.4.5');
+app.version('0.4.6');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
