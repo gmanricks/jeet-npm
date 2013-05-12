@@ -4,13 +4,15 @@ var app = require('commander');
 var terminal = require('color-terminal');
 var download = require('github-download');
 var fs = require('fs');
+var http = require('http');
+var net = require('net');
 var stylus = require('stylus');
 var nib = require('nib');
 var compass = require('compass');
-var sync = require('synchronize');
-var liveReload = require('livereload');
-var net = require('net');
+var tinylr = require('tiny-lr');
 
+
+var livereload = false;
 app.version('0.4.4');
 
 app.option('-t, --stylus', 'Only use Stylus');
@@ -32,11 +34,19 @@ app.command('create <app_name>').description("Create a new Jeet app").action(fun
 });
 
 app.command('watch').description("Watch the current path and recompile CSS on changes").action(function(){
-	var cssPath = getCssPath();
-	terminal.colorize("\n%W%0%UWatching App%n\n");
+	var rootPath = getRootPath();
+	cssPath = rootPath + "css/";
+	terminal.colorize("\n%W%0%UWatching App%n\n\n");
 	compileStylus(cssPath);
 	compileSCSS(cssPath);
 	startLiveReload(cssPath)
+	fs.watch(rootPath, function(e, filename) {
+		//var ext = filename.substr(-4);
+		//if (ext === "html" || ext === ".css")
+		if (livereload) {
+			http.get("http://localhost:35729/changed?files=" + filename);
+		}
+	}); 
 	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
 		var scssFilesArr = fs.readdirSync(cssPath + "scss");
 		for (var i = 0; i < scssFilesArr.length; i++) {
@@ -98,13 +108,17 @@ function isPortTaken (PORT, callback) {
   tester.listen(PORT)
 }
 
-function startLiveReload(cssPath) {
+function startLiveReload() {
 	isPortTaken(35729, function (err, taken) {
 		if (!err && !taken) {	
-			var server = liveReload.createServer({ port: 35729, exts: ['css', 'html']});
-			server.watch(cssPath.substr(0, cssPath.length-4));
+			tinylr().listen(35729, function(){
+				livereload = true;
+				terminal.color("green").write("    Live Reload is on and listening !").reset().write("\n");   
+			});
+			//var server = liveReload.createServer({ port: 35729, exts: ['css', 'html']});
+			//server.watch(cssPath.substr(0, cssPath.length-4));
 		} else if (!err && taken) {
-			terminal.color("red").write("    The live-reload port seems to be in use by another app, so live-reload will be turned off").reset().write("\n\n");
+			terminal.color("red").write("    The livereload port seems to be in use by another app, so live-reload will be turned off").reset().write("\n\n");
 		} else {
 			terminal.color("red").write(err).reset().write("\n\n");
 			process.kill();	
@@ -112,19 +126,19 @@ function startLiveReload(cssPath) {
 	});
 }
 
-function getCssPath () {
-	var cssPath = process.cwd();
-	if (fs.existsSync(cssPath + "/styl") || fs.existsSync(cssPath + "/scss")) {
-		cssPath += "/";
-	} else if (fs.existsSync(cssPath + "/css/styl") || fs.existsSync(cssPath + "/css/scss")) {
-		cssPath += "/css/";
-	} else if (fs.existsSync(cssPath + "/web/css/styl") || fs.existsSync(cssPath + "/web/css/scss")) {
-		cssPath += "/web/css/";
+function getRootPath () {
+	var rootPath = process.cwd();
+	if (fs.existsSync(rootPath + "/styl") || fs.existsSync(rootPath + "/scss")) {
+		rootPath = rootPath.substr(0, rootPath.length - 3);
+	} else if (fs.existsSync(rootPath + "/css/styl") || fs.existsSync(rootPath + "/css/scss")) {
+		rootPath += "/";
+	} else if (fs.existsSync(rootPath + "/web/css/styl") || fs.existsSync(rootPath + "/web/css/scss")) {
+		rootPath += "/web/";
 	} else {
 		terminal.color("red").write("This doesn't appear to be a Jeet Project").reset().write("\n\n");
 		process.kill();		
 	}
-	return cssPath;
+	return rootPath;
 }
 
 function compileSCSS (cssPath) {
@@ -141,7 +155,13 @@ function compileSCSS (cssPath) {
 		return;
 	}
 	compass.compile({cwd: cssPath + "scss"}, function(err) {
-		var message = "    Compiling SCSS ... ";
+		var message = "";
+	
+		if (livereload) {
+			message += "\n";
+		}
+
+		message += "    Compiling SCSS ... ";
 
 		if (err) {
 			message += "%rError!%n\n\n";		
@@ -158,6 +178,9 @@ function compileSCSS (cssPath) {
 		}
 		
 		terminal.colorize(message);
+		if (livereload) {
+			http.get("http://localhost:35729/changed?files=" + cssPath + "scss/style_scss.css");
+		}
 	}); 
 }
 
@@ -174,7 +197,9 @@ function compileStylus (cssPath) {
 		//No STYL style file
 		return;
 	}
-	
+	if (livereload) {
+		terminal.write("\n");
+	}
 	terminal.write("    Compiling Stylus ... ");
 	var styleFile = fs.readFileSync(stylFile);
 	try {
@@ -184,6 +209,10 @@ function compileStylus (cssPath) {
 		terminal.write("    Saving Compiled Stylus ... ");
 		fs.writeFileSync(cssPath + "styl/style_styl.css", styleFile);
 		terminal.color("green").write("OK!").reset().write("\n\n");
+		if (livereload) {
+			http.get("http://localhost:35729/changed?files=" + cssPath + "styl/style_styl.css");
+		}
+
 	} catch (e) {
 		terminal.color("red").write("Error!").reset().write("\n\n");
 	}

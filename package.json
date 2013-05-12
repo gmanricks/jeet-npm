@@ -18,7 +18,6 @@
     "stylus": "~0.32.1",
     "nib": "~0.9.1",
     "compass": "~0.1.0",
-    "synchronize": "~0.5.2",
-    "livereload": "~0.3.0"
+	"tiny-lr": "~0.0.4"
   }
 }
