@@ -11,8 +11,9 @@ var nib = require('nib');
 var compass = require('compass');
 var tinylr = require('tiny-lr');
 
+
 var livereload = false;
-app.version('0.3.1');
+app.version('0.4.4');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
@@ -202,7 +203,7 @@ function compileStylus (cssPath) {
 	terminal.write("    Compiling Stylus ... ");
 	var styleFile = fs.readFileSync(stylFile);
 	try {
-		styleFile = stylus(styleFile.toString()).set('paths', [cssPath + "styl"]).use(nib()).render();
+		styleFile = stylus(styleFile.toString()).set('paths', [cssPath + "styl"]).set('compress', true).use(nib()).render();
 		terminal.color("green").write("OK!").reset().write("\n");
 	
 		terminal.write("    Saving Compiled Stylus ... ");
