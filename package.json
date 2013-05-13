@@ -1,6 +1,6 @@
 {
   "name": "jeet",
-  "version": "0.4.5",
+  "version": "0.4.7",
   "description": "A light, semantic, responsive, CSS framework built from the best parts.",
   "keywords": [
     "css",
@@ -18,6 +18,6 @@
     "stylus": "~0.32.1",
     "nib": "~0.9.1",
     "compass": "~0.1.0",
-	"tiny-lr": "~0.0.4"
+    "tiny-lr": "~0.0.4"
   }
 }
