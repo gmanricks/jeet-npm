@@ -12,8 +12,10 @@ var compass = require('compass');
 var tinylr = require('tiny-lr');
 
 
+var p = JSON.parse(fs.readFileSync('package.json'));
+
 var livereload = false;
-app.version('0.4.7');
+app.version(p.version);
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
