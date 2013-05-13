@@ -13,7 +13,7 @@ var tinylr = require('tiny-lr');
 
 
 var livereload = false;
-app.version('0.4.4');
+app.version('0.4.5');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
@@ -50,16 +50,16 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
 		var scssFilesArr = fs.readdirSync(cssPath + "scss");
 		for (var i = 0; i < scssFilesArr.length; i++) {
-			if (fs.statSync(cssPath + "scss/" + scssFilesArr[i]).isDirectory()) {
+			if (fs.statSync(cssPath + "scss/" + scssFilesArr[i]).isDirectory() && scssFilesArr[i].substr(-4, 1) !== ".") {
 				fs.watch(cssPath + "scss/" + scssFilesArr[i], function(e, filename){
-					if (filename.substr(-5) === ".scss") {			
+					if (filename && filename.substr(-5) === ".scss") {			
 						compileSCSS(cssPath);
 					}
 				});
 			}
 		}
 		fs.watch(cssPath + "scss", function(e, filename){
-			if (filename.substr(-5) === ".scss") {		
+			if (filename && filename.substr(-5) === ".scss") {		
 				compileSCSS(cssPath);
 			}
 		});
@@ -68,16 +68,16 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	if (fs.existsSync(cssPath + "styl") && !app.scss) {
 		var stylFilesArr = fs.readdirSync(cssPath + "styl");
 		for (var i = 0; i < stylFilesArr.length; i++) {
-			if (fs.statSync(cssPath + "styl/" + stylFilesArr[i]).isDirectory()) {
+			if (fs.statSync(cssPath + "styl/" + stylFilesArr[i]).isDirectory() && stylFilesArr[i].substr(-4, 1) !== ".") {
 				fs.watch(cssPath + "styl/" + stylFilesArr[i], function(e, filename){
-					if (filename.substr(-5) === ".styl") {			
+					if (filename && filename.substr(-5) === ".styl") {			
 						compileStylus(cssPath);
 					}
 				});
 			}
 		}
 		fs.watch(cssPath + "styl", function(e, filename){
-			if (filename.substr(-5) === ".styl") {			
+			if (filename && filename.substr(-5) === ".styl") {			
 				compileStylus(cssPath);
 			}
 		});
