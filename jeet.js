@@ -41,9 +41,9 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	compileSCSS(cssPath);
 	startLiveReload(cssPath)
 	fs.watch(rootPath, function(e, filename) {
-		//var ext = filename.substr(-4);
+		var ext = filename.substr(-4);
 		//if (ext === "html" || ext === ".css")
-		if (livereload) {
+		if (livereload && ext !== ".git") {
 			http.get("http://localhost:35729/changed?files=" + filename);
 		}
 	}); 
