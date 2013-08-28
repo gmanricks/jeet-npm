@@ -13,7 +13,7 @@ var tinylr = require('tiny-lr');
 
 
 var livereload = false;
-app.version('0.5.1');
+app.version('0.5.2');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
@@ -41,21 +41,37 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	terminal.colorize("\n%W%0%UWatching App%n\n\n");
 	compileStylus(cssPath);
 	compileSCSS(cssPath);
-	startLiveReload(cssPath)
-	fs.watch(rootPath, function(e, filename) {
+	startLiveReload(cssPath);
+	var watcher = null;
+	try {
+		watcher = fs.watch(rootPath, function(e, filename) {
+			if (app.debug) {
+				console.log("//////STARTDEBUG///////");
+				console.log(filename);
+				console.log(e);
+				console.log("//////ENDDEBUG///////");
+			}
+			if (filename) {
+				var ext = filename.substr(-4);
+				if (livereload && ext !== ".git") {
+					http.get("http://localhost:35729/changed?files=" + filename);
+				}
+			}
+		}); 
+		watcher.on("error", function (e) {
+			if (app.debug) {
+				console.log("//////STARTDEBUG///////");
+				console.log(e);
+				console.log("//////ENDDEBUG///////");
+			}
+		});
+	} catch (e) {
 		if (app.debug) {
 			console.log("//////STARTDEBUG///////");
-			console.log(filename);
 			console.log(e);
 			console.log("//////ENDDEBUG///////");
 		}
-		if (filename) {
-			var ext = filename.substr(-4);
-			if (livereload && ext !== ".git") {
-				http.get("http://localhost:35729/changed?files=" + filename);
-			}
-		}
-	}); 
+	}
 	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
 		var scssFilesArr = fs.readdirSync(cssPath + "scss");
 		for (var i = 0; i < scssFilesArr.length; i++) {
