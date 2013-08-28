@@ -13,10 +13,12 @@ var tinylr = require('tiny-lr');
 
 
 var livereload = false;
-app.version('0.5.0');
+app.version('0.5.1');
 
 app.option('-t, --stylus', 'Only use Stylus');
 app.option('-c, --scss', 'Only use SCSS');
+app.option('-d, --debug', 'Turn on Debugging');
+
 
 app.command('create <app_name>').description("Create a new Jeet app").action(function(app_name) {
 	terminal.colorize("\n%W%0%UCreating " + app_name + "%n\n");
@@ -41,10 +43,17 @@ app.command('watch').description("Watch the current path and recompile CSS on ch
 	compileSCSS(cssPath);
 	startLiveReload(cssPath)
 	fs.watch(rootPath, function(e, filename) {
-		var ext = filename.substr(-4);
-		//if (ext === "html" || ext === ".css")
-		if (livereload && ext !== ".git") {
-			http.get("http://localhost:35729/changed?files=" + filename);
+		if (app.debug) {
+			console.log("//////STARTDEBUG///////");
+			console.log(filename);
+			console.log(e);
+			console.log("//////ENDDEBUG///////");
+		}
+		if (filename) {
+			var ext = filename.substr(-4);
+			if (livereload && ext !== ".git") {
+				http.get("http://localhost:35729/changed?files=" + filename);
+			}
 		}
 	}); 
 	if (fs.existsSync(cssPath + "scss") && !app.stylus) {
