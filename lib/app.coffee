@@ -4,10 +4,10 @@ tinylr = require "tiny-lr"
 cltags = require "cltags"
 http = require "http"
 net = require "net"
-tags = cltags.parse(process.argv, {}, { h: "help", v: "version", V: "version" });
+tags = cltags.parse(process.argv, {ignore: false}, { h: "help", v: "version", V: "version" });
 
-pjson = require '../package.json'
-app_version = "jeet-npm v" + pjson.version
+jjson = require '../package.json'
+app_version = "jeet-npm v" + jjson.version
 
 #Remove Extra Debug strings from Tiny-LR
 clog = console.log
@@ -51,6 +51,36 @@ if tags.command is "watch"
             console.log "\x1B[0;32m" + file.split("/").pop() + " modified & reloaded\x1B[0;0m"
         else
             console.log "\x1B[0;32m" + file.split("/").pop() + " modified\x1B[0;0m"
+
+
+else if tags.command is "create" or tags.create is true
+    if not tags.ignore
+        ajson = require "../node_modules/axis-css/package.json"
+        sjson = require "../node_modules/stylus/package.json"
+        check = [jjson, ajson, sjson]
+        npm = "http://registry.npmjs.org/"
+
+        (lookup = () ->
+            if check.length is 0
+                #create
+            else
+                p = check.shift()
+                http.get(npm + p.name + "/latest", (res) ->
+                    data = ""
+                    res.on "data", (d) ->
+                        data += d.toString()
+                    res.on "end", () ->
+                        data = JSON.parse(data);
+                        if data.version isnt p.version
+                            console.log "There is a newer version of " + p.name + " available please run `\x1B[0;1mnpm install -g jeet\x1B[0;0m` before creating a new project"
+                        else
+                            lookup()
+                ).on 'error', (e) ->
+                    lookup()
+        )()
+    else
+        #create
+
 
 else if tags.command is "help" or tags.help is true
     console.log """
