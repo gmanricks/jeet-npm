@@ -33,7 +33,7 @@ startLiveReload = () ->
         if not err and not taken
             tinylr().listen 35729, () ->
             tags.livereload = true
-            console.log "\x1B[0;32mLive Reload is listening on port 35729!!!\x1B[0;0m\n"
+            console.log "\x1B[0;32mLive Reload is listening on port 35729\x1B[0;0m\n"
         else if not err and taken
             tags.livereload = false
             console.log "\x1B[0;31mThe livereload port seems to be in use by another app, so live-reload will be turned off\x1B[0;0m\n"
@@ -48,9 +48,9 @@ if tags.command is "watch"
             compile(watcher.stylFile);
         else if tags.livereload
             http.get "http://localhost:35729/changed?files=" + file
-            console.log "\x1B[0;32m" + file.split("/").pop() + " modified & reloaded!!!\x1B[0;0m\n"
+            console.log "\x1B[0;32m" + file.split("/").pop() + " modified & reloaded\x1B[0;0m"
         else
-            console.log "\x1B[0;32m" + file.split("/").pop() + " modified!!!\x1B[0;0m\n"
+            console.log "\x1B[0;32m" + file.split("/").pop() + " modified\x1B[0;0m"
 
 else if tags.command is "help" or tags.help is true
     console.log """

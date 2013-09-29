@@ -51,6 +51,8 @@ exports.watch = (cb) ->
     root = locateRoot process.cwd()
     exports.stylFile = root + "/css/"
     if root
+        #Compile the Base Styl file
+        cb root + "/css/custom.styl"
         getFiles root, (err, files) ->
             cycle(root, files, cb)
     else
