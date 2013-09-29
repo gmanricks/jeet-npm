@@ -10,7 +10,7 @@ getFiles = (dir, done) ->
         (next = () ->
             file = list[i++];
             return done(null, results) if not file
-            if file.charAt(0) is "." or file is "minified.js"
+            if file.charAt(0) is "." or file is "minified.js" or file.substr(0, 6) is "jquery" or file.substr(0, 9) is "modernizr" or file.substr(0, 11) is "selectivizr"
                 next()
             else
                 file = dir + '/' + file
