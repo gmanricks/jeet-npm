@@ -1,23 +1,20 @@
 {
   "name": "jeet",
-  "version": "0.5.1",
+  "version": "3.0.0",
   "description": "A light, semantic, responsive, CSS framework built from the best parts.",
   "keywords": [
     "css",
     "jeet",
-    "scss",
     "stylus"
   ],
   "homepage": "http://jeetframework.com/",
   "bin": "jeet.js",
   "main": "jeet.js",
   "dependencies": {
-    "commander": "~1.1.1",
-    "color-terminal": "~0.0.3",
-    "github-download": "~0.2.0",
-    "stylus": "~0.32.1",
-    "nib": "~0.9.1",
-    "compass": "~0.1.0",
-    "tiny-lr": "~0.0.4"
+    "stylus": "*",
+    "axis-css": "*",
+    "tiny-lr": "*",
+    "cltags": "*",
+    "uglify-js": "*"
   }
 }
