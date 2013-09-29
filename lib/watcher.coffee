@@ -54,4 +54,5 @@ exports.watch = (cb) ->
         getFiles root, (err, files) ->
             cycle(root, files, cb)
     else
-        console.log "Doesn't appear to be a Jeet Directory"
+        console.log "\x1B[0;31mDoesn't appear to be a Jeet Directory\x1B[0;0m"
+        process.kill()
