@@ -34,10 +34,19 @@ mkdirp = (lp, path) ->
 exports = module.exports = (name) ->
     foldername = __dirname.split("/")
     foldername = foldername.slice(0, foldername.length-1).join("/") + "/jeet"
+    ignore = ["README.md", "watch"]
     localpath = "./" + name + "/"
-    if fs.existsSync localpath
+    if name is "." or name is "./"
+        localpath = "./"
+        name = process.cwd().split("/").pop()
+
+    if localpath is "./"
+        if fs.existsSync "./css/jeet.styl"
+            console.log "this is already a jeet project"
+            process.kill();
+    else if fs.existsSync localpath
         console.log name + " already exists"
-        process.kill()
+        process.kill();
     else
         fs.mkdirSync(localpath)
     getFiles foldername, (err, files) ->
@@ -47,13 +56,16 @@ exports = module.exports = (name) ->
             else
                 file = files.shift()
                 rfile = file.substr(foldername.length + 1)
-                path = rfile.split("/")
-                rfile = path.pop()
-                path = path.join("/")
-                mkdirp(localpath, path)
-                ws = fs.createWriteStream(localpath + path + "/" + rfile);
-                fs.createReadStream(file).pipe(ws);
-                ws.on "close", () ->
+                if ignore.indexOf(rfile) is -1
+                    path = rfile.split("/")
+                    rfile = path.pop()
+                    path = path.join("/")
+                    mkdirp(localpath, path)
+                    ws = fs.createWriteStream(localpath + path + "/" + rfile);
+                    fs.createReadStream(file).pipe(ws);
+                    ws.on "close", () ->
+                        cycle()
+                else
                     cycle()
         )()
 
