@@ -1,5 +1,6 @@
 watcher = require "./watcher.js"
 compile = require "./compiler.js"
+create = require "./create.js"
 tinylr = require "tiny-lr"
 cltags = require "cltags"
 http = require "http"
@@ -12,7 +13,7 @@ app_version = "jeet-npm v" + jjson.version
 #Remove Extra Debug strings from Tiny-LR
 clog = console.log
 console.log = (object) ->
-    if object.toString().substr(0, 10) isnt "... Reload"
+    if object and object.toString().substr(0, 10) isnt "... Reload"
         clog(object)
 
 isPortTaken = (PORT, callback) ->
@@ -54,6 +55,7 @@ if tags.command is "watch"
 
 
 else if tags.command is "create" or tags.create is true
+    tags.query = "jeet" if tags.query is ""
     if not tags.ignore
         ajson = require "../node_modules/axis-css/package.json"
         sjson = require "../node_modules/stylus/package.json"
@@ -62,7 +64,7 @@ else if tags.command is "create" or tags.create is true
 
         (lookup = () ->
             if check.length is 0
-                #create
+                create(tags.query)
             else
                 p = check.shift()
                 http.get(npm + p.name + "/latest", (res) ->
@@ -80,7 +82,7 @@ else if tags.command is "create" or tags.create is true
                     lookup()
         )()
     else
-        #create
+        create(tags.query)
 
 
 else if tags.command is "help" or tags.help is true
