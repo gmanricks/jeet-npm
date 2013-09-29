@@ -73,6 +73,7 @@ else if tags.command is "create" or tags.create is true
                         data = JSON.parse(data);
                         if data.version isnt p.version
                             console.log "There is a newer version of " + p.name + " available please run `\x1B[0;1mnpm install -g jeet\x1B[0;0m` before creating a new project"
+                            console.log "To ignore this check run this command with the `\x1B[0;1m--ignore\x1B[0;0m` flag"
                         else
                             lookup()
                 ).on 'error', (e) ->
@@ -88,6 +89,7 @@ else if tags.command is "help" or tags.help is true
 
     Commands:
         watch                   watch the current path and recompile CSS on changes
+        create <name>           create a new jeet project with the given name
 
         Options:
             -h, --help          output usage information
