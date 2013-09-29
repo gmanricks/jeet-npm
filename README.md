@@ -39,3 +39,8 @@ CLI Usage
 `jeet create` will fetch the latest copy of Jeet from the repo. If it already has the latest copy or you don't have internet access, it will not fetch it and simply use the most recent copy of Jeet the package is equipped with. This makes project creation very fast and makes sure you have the latest/greatest version of Jeet created each time.
 
 Jeet will watch your project for changes to `.styl` files within `/css`. It will concatenate and minify that CSS to `css/custom.css`. Jeet will also watch your `/js` automatically concatenate and minify most of your JavaScript (the ones that aren't already included as oldIE polyfills) including your `plugins.js`, `main.js`, and any new `.js` files in your `/js` dir.
+
+Jeet 2
+---
+
+Jeet 2's NPM package is still available under the [jeet2 branch](https://github.com/CorySimmons/jeet-npm/tree/jeet2)
