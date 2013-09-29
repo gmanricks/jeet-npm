@@ -47,10 +47,13 @@ cycle = (path, list, cb) ->
 
 exports.watch = (cb) ->
     root = locateRoot process.cwd()
-    exports.stylFile = root + "/css/"
     if root
-        #Compile the Base Styl file
+        exports.stylFile = root + "/css/"
+        exports.jsDir = root + "/js"
+
+        #Compile the Base Styl and JS files
         cb root + "/css/custom.styl"
+        cb root + "/js/main.js"
         getFiles root, (err, files) ->
             cycle(root, files, cb)
     else

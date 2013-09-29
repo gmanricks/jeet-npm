@@ -1,6 +1,7 @@
 watcher = require "./watcher.js"
 compile = require "./compiler.js"
 create = require "./create.js"
+minify = require "./minify.js"
 tinylr = require "tiny-lr"
 cltags = require "cltags"
 http = require "http"
@@ -46,7 +47,9 @@ if tags.command is "watch"
     startLiveReload()
     watcher.watch (file) ->
         if file.substr(-5) is ".styl"
-            compile(watcher.stylFile);
+            compile(watcher.stylFile)
+        else if file.substr(-3) is ".js" and file.substr(-11) isnt "minified.js"
+            minify(watcher.jsDir)
         else if tags.livereload
             http.get "http://localhost:35729/changed?files=" + file
             console.log "\x1B[0;32m" + file.split("/").pop() + " modified & reloaded\x1B[0;0m"
