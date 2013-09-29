@@ -6,8 +6,6 @@ locateRoot = (root) ->
     if fs.existsSync root + "/jeet.styl"
         root = root.split "/"
         return root.slice(0, root.length - 1).join "/"
-    else if fs.existsSync root + "/jeet/css/jeet.styl"
-        return root + "/jeet";
     else
         return false
 
