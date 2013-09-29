@@ -33,10 +33,10 @@ startLiveReload = () ->
         if not err and not taken
             tinylr().listen 35729, () ->
             tags.livereload = true
-            console.log "\x1B[0;32mLive Reload is listening on port 35729\x1B[0;0m\n"
+            console.log "Live Reload is listening on port 35729"
         else if not err and taken
             tags.livereload = false
-            console.log "\x1B[0;31mThe livereload port seems to be in use by another app, so live-reload will be turned off\x1B[0;0m\n"
+            console.log "\x1B[0;31mThe livereload port seems to be in use by another app, so live-reload will be turned off\x1B[0;0m"
         else
             console.log "\x1B[0;31m" + err + "\x1B[0;0m\n"
             process.kill()

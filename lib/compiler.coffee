@@ -25,5 +25,5 @@ exports = module.exports = (path) ->
             console.log "````````````````````````````````````"
         else
             fs.writeFile path + "custom.css", css, () ->
-                console.log "\x1B[0;32mRecompiled custom.styl\x1B[0;0m"
+                console.log "Recompiled custom.styl"
 
