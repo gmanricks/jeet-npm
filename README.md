@@ -1,9 +1,7 @@
 Jeet 3 NPM Package
 ---
 
-Website/Docs: http://jeetframework.com
-
-Github: https://github.com/CorySimmons/jeet
+[Jeet 3](https://github.com/CorySimmons/jeet) | [Documentation](http://jeetframework.com) | [Demos / Screencasts](http://jeetframework.com/demos)
 
 Installation:
 ---
