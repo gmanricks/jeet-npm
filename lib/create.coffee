@@ -65,7 +65,7 @@ downloadGithubFiles = (foldername, files, cb) ->
             httpsload file, (err, json) ->
                 cb(true) if err
                 data = JSON.parse(json)
-                contents = new Buffer(data.content, "base64").toString()
+                contents = new Buffer(data.content, "base64")
                 fs.writeFile foldername + "/" + data.path, contents, (err) ->
                     cb(true) if err
                     cycle()
@@ -80,7 +80,7 @@ mkdirp = (lp, path) ->
             fs.mkdirSync(cp)
 
 pullFromGithub = (foldername, cb) ->
-    console.log "Downloading a newer version of jeet"
+    console.log "Downloading a newer version of Jeet"
     getGithubFiles "https://api.github.com/repos/CorySimmons/jeet/contents/", (err, files) ->
         cb() if err
         downloadGithubFiles foldername, files, cb
@@ -112,7 +112,7 @@ exports = module.exports = (name) ->
 
         if localpath is "./"
             if fs.existsSync "./css/jeet.styl"
-                console.log "this is already a jeet project"
+                console.log "this is already a Jeet project"
                 process.kill();
         else if fs.existsSync localpath
             console.log name + " already exists"
@@ -138,5 +138,4 @@ exports = module.exports = (name) ->
                     else
                         cycle()
             )()
-
 
