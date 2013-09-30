@@ -35,7 +35,7 @@ httpsload = (url, cb) ->
         cb(true)
 
 getGithubFiles = (url, done) ->
-    ignore = ["README.md", "watch"]
+    ignore = ["README.md", "watch", "bower.json", "package.json"]
     results = []
     httpsload url, (err, json) ->
         return done(true) if err
@@ -104,7 +104,7 @@ exports = module.exports = (name) ->
     foldername = __dirname.split("/")
     foldername = foldername.slice(0, foldername.length-1).join("/") + "/jeet"
     updateRepo foldername, () ->
-        ignore = ["README.md", "watch"]
+        ignore = ["README.md", "watch", "bower.json", "package.json"]
         localpath = "./" + name + "/"
         if name is "." or name is "./"
             localpath = "./"
