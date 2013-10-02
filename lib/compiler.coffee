@@ -2,15 +2,18 @@ stylus = require "stylus"
 axis = require "axis-css"
 fs = require "fs"
 
-exports = module.exports = (path) ->
-    file = fs.readFileSync path + "custom.styl"
+exports = module.exports = (path, outname, outpath) ->
+    if not fs.existsSync path + outname + ".styl"
+        console.log("\x1B[0;31mAborting: Can't find " + outname + ".styl\x1B[0;0m")
+        process.kill()
+    file = fs.readFileSync path + outname + ".styl"
     stylus(file.toString(), { compress: true }).set('paths', [path]).use(axis()).render (err, css) ->
         if err
             msg = err.message.split "\n"
             fileline = msg.shift().split ":"
             linenumber = fileline.pop()
 
-            filename = "custom.styl"
+            filename = outname + ".styl"
             if fileline[0] isnt "stylus"
                 filename = fileline[0].split("/").pop()
 
@@ -24,5 +27,9 @@ exports = module.exports = (path) ->
             console.log msg.join("\n")
             console.log "````````````````````````````````````"
         else
-            fs.writeFile path + "custom.css", css, () ->
-                console.log "Recompiled custom.styl"
+            outpath = path if not outpath
+            outpath = outpath + "/" if outpath.charAt(outpath.length-1) isnt "/"
+            if not fs.existsSync outpath
+                fs.mkdirSync outpath
+            fs.writeFile outpath + outname + ".css", css, () ->
+                console.log "Recompiled " + outname + ".styl"

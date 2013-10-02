@@ -6,7 +6,7 @@ tinylr = require "tiny-lr"
 cltags = require "cltags"
 http = require "http"
 net = require "net"
-tags = cltags.parse(process.argv, {ignore: false}, { h: "help", v: "version", V: "version" });
+tags = cltags.parse(process.argv, {ignore: false, outpath: false, name: "custom"}, { h: "help", v: "version", V: "version", o: "outpath", n: "name" });
 
 jjson = require '../package.json'
 app_version = "jeet-npm v" + jjson.version
@@ -47,7 +47,7 @@ if tags.command is "watch"
     startLiveReload()
     watcher.watch (file) ->
         if file.substr(-5) is ".styl"
-            compile(watcher.stylFile)
+            compile(watcher.stylFile, tags.name, tags.outpath)
         else if file.substr(-3) is ".js" and file.substr(-11) isnt "minified.js"
             minify(watcher.jsDir)
         else if tags.livereload
@@ -99,6 +99,8 @@ else if tags.command is "help" or tags.help is true
         Options:
             -h, --help          output usage information
             -V/-v, --version    output the version number
+            -o, --outpath       the folder to compile the css into
+            -n, --name          the name of the styl file [defaults to "custom"]
 
                 """
 
