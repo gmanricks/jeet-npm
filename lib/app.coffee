@@ -47,7 +47,11 @@ if tags.command is "watch"
     startLiveReload()
     watcher.watch (file) ->
         if file.substr(-5) is ".styl"
-            compile(watcher.stylFile, tags.name, tags.outpath)
+            compile(watcher.stylFile, tags.name, tags.outpath, (remf) ->
+                if tags.livereload
+                    http.get "http://localhost:35729/changed?files=" + remf
+                    console.log "\x1B[0;32m" + remf.split("/").pop() + " modified & reloaded\x1B[0;0m"
+            )
         else if file.substr(-3) is ".js" and file.substr(-11) isnt "minified.js"
             minify(watcher.jsDir)
         else if tags.livereload

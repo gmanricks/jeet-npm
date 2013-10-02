@@ -2,7 +2,7 @@ stylus = require "stylus"
 axis = require "axis-css"
 fs = require "fs"
 
-exports = module.exports = (path, outname, outpath) ->
+exports = module.exports = (path, outname, outpath, cb) ->
     if not fs.existsSync path + outname + ".styl"
         console.log("\x1B[0;31mAborting: Can't find " + outname + ".styl\x1B[0;0m")
         process.kill()
@@ -27,9 +27,13 @@ exports = module.exports = (path, outname, outpath) ->
             console.log msg.join("\n")
             console.log "````````````````````````````````````"
         else
-            outpath = path if not outpath
+            reload = true
+            if not outpath
+                output = path
+                reload = false
             outpath = outpath + "/" if outpath.charAt(outpath.length-1) isnt "/"
             if not fs.existsSync outpath
                 fs.mkdirSync outpath
             fs.writeFile outpath + outname + ".css", css, () ->
                 console.log "Recompiled " + outname + ".styl"
+                cb(outpath + outname + ".css") if reload
