@@ -24,7 +24,7 @@ Commands:
         -n, --name          the name of the styl file [defaults to "custom"]
 ```
 
-**Note:** If you modify --outpath or --name you will have to reflect those changes in your index.html yourself.
+**Note:** If you modify `--outpath` or `--name` you will have to reflect those changes in your `index.html` yourself.
 
 LiveReload Installation
 ---
