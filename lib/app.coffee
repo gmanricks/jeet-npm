@@ -1,11 +1,13 @@
 watcher = require "./watcher.js"
 compile = require "./compiler.js"
 create = require "./create.js"
+coffeec = require "./coffeec.js"
 minify = require "./minify.js"
 tinylr = require "tiny-lr"
 cltags = require "cltags"
 http = require "http"
 net = require "net"
+
 tags = cltags.parse(process.argv, {ignore: false, outpath: false, name: "custom"}, { h: "help", v: "version", V: "version", o: "outpath", n: "name" });
 
 jjson = require '../package.json'
@@ -54,6 +56,8 @@ if tags.command is "watch"
             )
         else if file.substr(-3) is ".js" and file.substr(-11) isnt "minified.js"
             minify(watcher.jsDir)
+        else if file.substr(-7) is ".coffee"
+            coffeec(file)
         else if tags.livereload
             http.get "http://localhost:35729/changed?files=" + file
             console.log "\x1B[0;32m" + file.split("/").pop() + " modified & reloaded\x1B[0;0m"
@@ -64,14 +68,13 @@ if tags.command is "watch"
 else if tags.command is "create" or tags.create is true
     tags.query = "jeet" if tags.query is ""
     if not tags.ignore
-        ajson = require "../node_modules/axis-css/package.json"
         sjson = require "../node_modules/stylus/package.json"
-        check = [jjson, ajson, sjson]
+        check = [jjson, sjson]
         npm = "http://registry.npmjs.org/"
 
         (lookup = () ->
             if check.length is 0
-                create(tags.query)
+                create(tags.query, tags.ignore)
             else
                 p = check.shift()
                 http.get(npm + p.name + "/latest", (res) ->
@@ -89,7 +92,7 @@ else if tags.command is "create" or tags.create is true
                     lookup()
         )()
     else
-        create(tags.query)
+        create(tags.query, tags.ignore)
 
 
 else if tags.command is "help" or tags.help is true

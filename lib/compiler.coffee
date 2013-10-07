@@ -1,13 +1,14 @@
 stylus = require "stylus"
-axis = require "axis-css"
 fs = require "fs"
+autoprefixer = require "autoprefixer"
+cleancss = require "clean-css"
 
 exports = module.exports = (path, outname, outpath, cb) ->
     if not fs.existsSync path + outname + ".styl"
         console.log("\x1B[0;31mAborting: Can't find " + outname + ".styl\x1B[0;0m")
         process.kill()
     file = fs.readFileSync path + outname + ".styl"
-    stylus(file.toString(), { compress: true }).set('paths', [path]).use(axis()).render (err, css) ->
+    stylus(file.toString()).set('paths', [path]).render (err, css) ->
         if err
             msg = err.message.split "\n"
             fileline = msg.shift().split ":"
@@ -26,14 +27,19 @@ exports = module.exports = (path, outname, outpath, cb) ->
             console.log "````````````````````````````````````"
             console.log msg.join("\n")
             console.log "````````````````````````````````````"
+            return
         else
             reload = true
             if not outpath
-                output = path
+                outpath = path
                 reload = false
             outpath = outpath + "/" if outpath.charAt(outpath.length-1) isnt "/"
             if not fs.existsSync outpath
                 fs.mkdirSync outpath
+
+            #prefix and minify css
+            css = cleancss.process autoprefixer.compile(css)
+
             fs.writeFile outpath + outname + ".css", css, () ->
                 console.log "Recompiled " + outname + ".styl"
                 cb(outpath + outname + ".css") if reload

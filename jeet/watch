@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+stylus -w -c css/custom.styl

@@ -1,20 +1,33 @@
 {
-  "name": "jeet",
-  "version": "3.0.5",
-  "description": "A light, semantic, responsive, CSS framework built from the best parts.",
-  "keywords": [
-    "css",
-    "jeet",
-    "stylus"
-  ],
-  "homepage": "http://jeetframework.com/",
-  "bin": "jeet.js",
-  "main": "jeet.js",
-  "dependencies": {
-    "stylus": "*",
-    "axis-css": "*",
-    "tiny-lr": "*",
-    "cltags": "*",
-    "uglify-js": "*"
-  }
+    "name": "jeet",
+    "version": "3.0.10",
+    "description": "A light, semantic, responsive, CSS framework built from the best parts.",
+    "keywords": [
+        "css",
+        "jeet",
+        "stylus"
+    ],
+    "homepage": "http://jeetframework.com/",
+    "bin": "jeet.js",
+    "main": "jeet.js",
+    "dependencies": {
+        "stylus": "*",
+        "tiny-lr": "*",
+        "cltags": "*",
+        "uglify-js": "*",
+        "autoprefixer": "*",
+        "clean-css": "*",
+        "coffee-script": "*"
+    },
+    "categories": [
+        "CSS",
+        "Frameworks",
+        "UI"
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/CorySimmons/jeet-npm.git"
+        }
+    ]
 }

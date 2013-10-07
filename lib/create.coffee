@@ -1,5 +1,6 @@
 fs = require "fs"
 https = require "https"
+ghd = require "./githubd.js"
 
 #By Chrisopher Jeffrey
 getFiles = (dir, done) ->
@@ -24,89 +25,19 @@ getFiles = (dir, done) ->
                         next()
         )();
 
-httpsload = (url, cb) ->
-    https.get(url, (res) ->
-        data = ""
-        res.on "data", (d) ->
-            data += d.toString()
-        res.on "end", () ->
-            cb(false, data)
-    ).on "error", () ->
-        cb(true)
 
-getGithubFiles = (url, done) ->
-    ignore = ["README.md", "watch", "bower.json", "package.json"]
-    results = []
-    httpsload url, (err, json) ->
-        return done(true) if err
-        list = JSON.parse(json)
-        i = 0
-        (next = () ->
-            file = list[i++]
-            return done(false, results) if not file
-            if file.name.charAt(0) is "." or ignore.indexOf(file.name) isnt -1
-                next()
-            else
-                if file.type is "dir"
-                    getGithubFiles file.url, (err, res) ->
-                        results = results.concat(res)
-                        next()
-                else
-                    results.push file.url
-                    next()
-        )();
 
-downloadGithubFiles = (foldername, files, cb) ->
-    (cycle = () ->
-        if files.length is 0
-            cb(false)
-        else
-            file = files.shift()
-            httpsload file, (err, json) ->
-                cb(true) if err
-                data = JSON.parse(json)
-                if data.content
-                    contents = new Buffer(data.content, "base64")
-                    fs.writeFile foldername + "/" + data.path, contents, (err) ->
-                        cb(true) if err
-                        cycle()
-                else
-                    cb(true)
-    )();
-
+#Helper to create directories recursively
 mkdirp = (lp, path) ->
     path = path.split("/")
-    cp = lp
+    cp = lp if typeof lp is "string"
+    cp = cp + "/" if cp.charAt(cp.length-1) isnt "/"
     for p in path
         cp += p + "/"
         if not fs.existsSync cp
-            fs.mkdirSync(cp)
+            fs.mkdirSync cp
 
-pullFromGithub = (foldername, cb) ->
-    console.log "Downloading a newer version of Jeet"
-    getGithubFiles "https://api.github.com/repos/CorySimmons/jeet/contents/", (err, files) ->
-        cb() if err
-        downloadGithubFiles foldername, files, cb
-
-updateRepo = (foldername, cb) ->
-    httpsload "https://api.github.com/repos/CorySimmons/jeet", (err, res) ->
-        return cb() if err
-        try
-            data = JSON.parse(res)
-            fs.readFile foldername + "/.latest", (err, d) ->
-                if d.toString() isnt data.pushed_at
-                    pullFromGithub foldername, (err) ->
-                        if not err
-                            fs.writeFileSync(foldername + "/.latest", data.pushed_at)
-                        cb()
-                else
-                    cb()
-        catch e
-            cb()
-exports = module.exports = (name) ->
-    foldername = __dirname.split("/")
-    foldername = foldername.slice(0, foldername.length-1).join("/") + "/jeet"
-    updateRepo foldername, () ->
+cloneLocalRepo = (foldername, name) ->
         ignore = ["README.md", "watch", "bower.json", "package.json"]
         localpath = "./" + name + "/"
         if name is "." or name is "./"
@@ -141,4 +72,17 @@ exports = module.exports = (name) ->
                     else
                         cycle()
             )()
+
+
+exports = module.exports = (name, ignore) ->
+    foldername = __dirname.split("/")
+    foldername = foldername.slice(0, foldername.length-1).join("/") + "/jeet"
+    if not ignore
+        ghd.updateByRepo "CorySimmons", "jeet", foldername, (err) ->
+            if err
+                console.log(err)
+            else
+                cloneLocalRepo foldername, name
+    else
+        cloneLocalRepo foldername, name
 
