@@ -3,6 +3,7 @@ compile = require "./compiler.js"
 create = require "./create.js"
 coffeec = require "./coffeec.js"
 minify = require "./minify.js"
+jadec = require "./jadec.js"
 tinylr = require "tiny-lr"
 cltags = require "cltags"
 http = require "http"
@@ -58,6 +59,8 @@ if tags.command is "watch"
             minify(watcher.jsDir)
         else if file.substr(-7) is ".coffee"
             coffeec(file)
+        else if file.substr(-5) is ".jade"
+            jadec(file)
         else if tags.livereload
             http.get "http://localhost:35729/changed?files=" + file
             console.log "\x1B[0;32m" + file.split("/").pop() + " modified & reloaded\x1B[0;0m"
