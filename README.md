@@ -20,7 +20,11 @@ Commands:
     Options:
         -h, --help          output usage information
         -V/-v, --version    output the version number
+        -o, --outpath       the folder to compile the css into
+        -n, --name          the name of the styl file [defaults to "custom"]
 ```
+
+**Note:** If you modify `--outpath` or `--name` you will have to reflect those changes in your `index.html` yourself.
 
 LiveReload Installation
 ---
@@ -39,6 +43,8 @@ CLI Usage
 `jeet create` will fetch the latest copy of Jeet from the repo. If it already has the latest copy or you don't have internet access, it will not fetch it and simply use the most recent copy of Jeet the package is equipped with. This makes project creation very fast and makes sure you have the latest/greatest version of Jeet created each time.
 
 Jeet will watch your project for changes to `.styl` files within `/css`. It will concatenate and minify that CSS to `css/custom.css`. Jeet will also watch your `/js` automatically concatenate and minify most of your JavaScript (the ones that aren't already included as oldIE polyfills) including your `plugins.js`, `main.js`, and any new `.js` files in your `/js` dir.
+
+Jeet now also watches CoffeeScript files nested under your `/js` dir.
 
 Jeet 2
 ---
