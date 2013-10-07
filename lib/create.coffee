@@ -1,6 +1,7 @@
 fs = require "fs"
 https = require "https"
 ghd = require "./githubd.js"
+path = require "path"
 
 #By Chrisopher Jeffrey
 getFiles = (dir, done) ->
@@ -14,7 +15,7 @@ getFiles = (dir, done) ->
             if file.charAt(0) is "."
                 next()
             else
-                file = dir + '/' + file
+                file = dir + path.sep + file
                 fs.stat file, (err, stat) ->
                     if stat and stat.isDirectory()
                         getFiles file, (err, res) ->
@@ -28,31 +29,31 @@ getFiles = (dir, done) ->
 
 
 #Helper to create directories recursively
-mkdirp = (lp, path) ->
-    path = path.split("/")
+mkdirp = (lp, fpath) ->
+    fpath = fpath.split(path.sep)
     cp = lp if typeof lp is "string"
-    cp = cp + "/" if cp.charAt(cp.length-1) isnt "/"
-    for p in path
-        cp += p + "/"
+    cp = path.normalize(cp + path.sep)
+    for p in fpath
+        cp += p + path.sep
         if not fs.existsSync cp
             fs.mkdirSync cp
 
 cloneLocalRepo = (foldername, name) ->
         ignore = ["README.md", "watch", "bower.json", "package.json"]
-        localpath = "./" + name + "/"
+        localpath = path.normalize(process.cwd() + path.sep + name + path.sep)
         if name is "." or name is "./"
-            localpath = "./"
-            name = process.cwd().split("/").pop()
+            localpath = path.normalize(process.cwd() + path.sep)
+            name = process.cwd().split(path.sep).pop()
 
-        if localpath is "./"
-            if fs.existsSync "./css/jeet/"
+            if fs.existsSync localpath + "css" + path.sep + "jeet" + path.sep
                 console.log "this is already a Jeet project"
                 process.kill();
-        else if fs.existsSync localpath
-            console.log name + " already exists"
-            process.kill();
         else
-            fs.mkdirSync(localpath)
+            if fs.existsSync localpath
+                console.log name + " already exists"
+                process.kill();
+            else
+                fs.mkdirSync(localpath)
         getFiles foldername, (err, files) ->
             (cycle = ()->
                 if files.length is 0
@@ -61,11 +62,11 @@ cloneLocalRepo = (foldername, name) ->
                     file = files.shift()
                     rfile = file.substr(foldername.length + 1)
                     if ignore.indexOf(rfile) is -1
-                        path = rfile.split("/")
-                        rfile = path.pop()
-                        path = path.join("/")
-                        mkdirp(localpath, path)
-                        ws = fs.createWriteStream(localpath + path + "/" + rfile);
+                        fpath = rfile.split(path.sep)
+                        rfile = fpath.pop()
+                        fpath = fpath.join(path.sep)
+                        mkdirp(localpath, fpath)
+                        ws = fs.createWriteStream(path.normalize(localpath + path.sep + fpath + path.sep + rfile));
                         fs.createReadStream(file).pipe(ws);
                         ws.on "close", () ->
                             cycle()
@@ -74,9 +75,10 @@ cloneLocalRepo = (foldername, name) ->
             )()
 
 
-exports = module.exports = (name, ignore) ->
-    foldername = __dirname.split("/")
-    foldername = foldername.slice(0, foldername.length-1).join("/") + "/jeet"
+exports = module.exports = (name, ignore, debug) ->
+    if debug
+        console.log "Dirname: " + __dirname
+    foldername = path.normalize(__dirname + path.sep + ".." + path.sep + "jeet" + path.sep)
     if not ignore
         ghd.updateByRepo "CorySimmons", "jeet", foldername, (err) ->
             if err

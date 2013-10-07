@@ -9,7 +9,7 @@ cltags = require "cltags"
 http = require "http"
 net = require "net"
 
-tags = cltags.parse(process.argv, {ignore: false, outpath: false, name: "custom"}, { h: "help", v: "version", V: "version", o: "outpath", n: "name" });
+tags = cltags.parse(process.argv, {ignore: false, outpath: false, name: "custom", debug: false}, { h: "help", v: "version", V: "version", o: "outpath", n: "name" });
 
 jjson = require '../package.json'
 app_version = "jeet-npm v" + jjson.version
@@ -77,7 +77,7 @@ else if tags.command is "create" or tags.create is true
 
         (lookup = () ->
             if check.length is 0
-                create(tags.query, tags.ignore)
+                create(tags.query, tags.ignore, tags.debug)
             else
                 p = check.shift()
                 http.get(npm + p.name + "/latest", (res) ->
@@ -95,7 +95,7 @@ else if tags.command is "create" or tags.create is true
                     lookup()
         )()
     else
-        create(tags.query, tags.ignore)
+        create(tags.query, tags.ignore, tags.debug)
 
 
 else if tags.command is "help" or tags.help is true
