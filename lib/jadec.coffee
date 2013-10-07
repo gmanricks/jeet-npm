@@ -7,7 +7,7 @@ exports = module.exports = (path) ->
         html = ""
         code = data.toString()
         try
-            html = jade.compile(code)
+            html = jade.compile(code, { pretty: true })
         catch e
             msg = e.message.split "\n"
             fileline = msg.shift().split ":"
