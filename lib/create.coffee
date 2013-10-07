@@ -45,7 +45,7 @@ cloneLocalRepo = (foldername, name) ->
             name = process.cwd().split("/").pop()
 
         if localpath is "./"
-            if fs.existsSync "./css/jeet.styl"
+            if fs.existsSync "./css/jeet/"
                 console.log "this is already a Jeet project"
                 process.kill();
         else if fs.existsSync localpath

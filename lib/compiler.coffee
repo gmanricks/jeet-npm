@@ -8,7 +8,7 @@ exports = module.exports = (path, outname, outpath, cb) ->
         console.log("\x1B[0;31mAborting: Can't find " + outname + ".styl\x1B[0;0m")
         process.kill()
     file = fs.readFileSync path + outname + ".styl"
-    stylus(file.toString()).set('paths', [path]).render (err, css) ->
+    stylus(file.toString()).set('paths', [path, path + "jeet/"]).render (err, css) ->
         if err
             msg = err.message.split "\n"
             fileline = msg.shift().split ":"

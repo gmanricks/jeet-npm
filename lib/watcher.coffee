@@ -2,8 +2,8 @@ fs = require "fs"
 exports = module.exports = {}
 
 locateRoot = (root) ->
-    return root if fs.existsSync root + "/css/jeet.styl"
-    if fs.existsSync root + "/jeet.styl"
+    return root if fs.existsSync root + "/css/jeet/"
+    if fs.existsSync root + "/jeet/"
         root = root.split "/"
         return root.slice(0, root.length - 1).join "/"
     else
