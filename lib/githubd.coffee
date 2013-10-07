@@ -1,6 +1,7 @@
 fs = require "fs"
 https = require "https"
 crypto = require "crypto"
+path = require "path"
 
 ignore = ["README.md", "watch", "bower.json", "package.json"]
 
@@ -46,9 +47,9 @@ getReposFileHashes = (url, cb) ->
 
 
 #Helper to get Sha1 Hash
-getShaForFile = (path, cb) ->
+getShaForFile = (fpath, cb) ->
     shasum = crypto.createHash "sha1"
-    s = fs.ReadStream path
+    s = fs.ReadStream fpath
     s.on "data", (d) ->
         shasum.update(d)
     s.on "end", () ->
@@ -59,13 +60,13 @@ getShaForFile = (path, cb) ->
 
 #Helper to filter file list down if not required
 skipUpToDate = (localFolder, files, cb) ->
-    localFolder = localFolder + "/" if localFolder.charAt(localFolder.length - 1) isnt "/"
+    localFolder = path.normalize(localFolder + path.sep)
     results = []
     i = 0
     (next = () ->
         file = files[i++]
         return cb(false, results) if not file
-        lp = localFolder + file.path
+        lp = path.normalize(localFolder + file.path)
         fs.exists lp, (exists) ->
             if exists
                 getShaForFile lp, (err, hash) ->
@@ -78,8 +79,8 @@ skipUpToDate = (localFolder, files, cb) ->
                 next()
     )()
 
-downloadGithubFiles = (path, files, cb) ->
-    path = path + "/" if path.charAt(path.length - 1) isnt "/"
+downloadGithubFiles = (fpath, files, cb) ->
+    fpath = path.normalize(fpath + path.sep)
     (cycle = () ->
         if files.length is 0
             cb(false)
@@ -91,26 +92,26 @@ downloadGithubFiles = (path, files, cb) ->
                     contents = ""
                     if json.size isnt 0
                         contents = new Buffer(json.content, "base64")
-                    fs.writeFile path + file.path, contents, (err) ->
+                    fs.writeFile path.normalize(fpath + file.path), contents, (err) ->
                         return cb(err) if err
                         cycle()
                 else
                     cb(true)
     )()
 
-exports.updateByRepo = (username, reponame, path, cb) ->
+exports.updateByRepo = (username, reponame, fpath, cb) ->
     url = "https://api.github.com/repos/" + username + "/" + reponame + "/contents/"
     console.log "Checking for updates to Jeet"
     getReposFileHashes url, (err, gfiles) ->
         #ToDo Remove files that are no longer in the repo
         return cb(err) if err
-        skipUpToDate path, gfiles, (err, files) ->
+        skipUpToDate fpath, gfiles, (err, files) ->
             return cb(err) if err
             if files.length is 0
                 console.log "No new updates"
                 return cb(false)
             else
-                downloadGithubFiles path, files, (err) ->
+                downloadGithubFiles fpath, files, (err) ->
                     return cb(err) if err
                     console.log "Update Complete"
                     return cb(false)
