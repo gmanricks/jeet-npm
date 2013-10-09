@@ -1,6 +1,8 @@
 Jeet 3 NPM Package
 ---
 
+[![Dependency Status](https://david-dm.org/corysimmons/jeet.png)](https://david-dm.org/corysimmons/jeet)
+
 [Jeet 3](https://github.com/CorySimmons/jeet) | [Documentation](http://jeetframework.com) | [Demos / Screencasts](http://jeetframework.com/demos) | [NPM package](https://npmjs.org/package/jeet)
 
 Installation:
