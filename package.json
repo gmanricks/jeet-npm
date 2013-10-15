@@ -1,6 +1,6 @@
 {
     "name": "jeet",
-    "version": "3.0.18",
+    "version": "3.0.19",
     "description": "A light, semantic, responsive, CSS framework built from the best parts.",
     "keywords": [
         "css",
@@ -16,7 +16,7 @@
         "cltags": "*",
         "uglify-js": "*",
         "autoprefixer": "*",
-        "clean-css": "*",
+        "csso": "*",
         "coffee-script": "*",
         "jade": "*"
     },

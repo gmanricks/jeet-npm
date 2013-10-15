@@ -1,7 +1,7 @@
 stylus = require "stylus"
 fs = require "fs"
 autoprefixer = require "autoprefixer"
-cleancss = require "clean-css"
+csso = require "csso"
 
 exports = module.exports = (path, outname, outpath, cb) ->
     if not fs.existsSync path + outname + ".styl"
@@ -38,7 +38,7 @@ exports = module.exports = (path, outname, outpath, cb) ->
                 fs.mkdirSync outpath
 
             #prefix and minify css
-            css = cleancss.process autoprefixer.compile(css)
+            css = csso.justDoIt autoprefixer.compile(css)
 
             fs.writeFile outpath + outname + ".css", css, () ->
                 console.log "Recompiled " + outname + ".styl"
