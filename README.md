@@ -5,6 +5,9 @@ Jeet 3 NPM Package
 
 [Jeet 3](https://github.com/CorySimmons/jeet) | [Documentation](http://jeetframework.com) | [Demos / Screencasts](http://jeetframework.com/demos) | [NPM package](https://npmjs.org/package/jeet)
 
+#[Jeet 4](https://github.com/mojotech/jeet) no longer uses this Jeet specific watcher. Now we use [Roots](https://github.com/jenius/roots) for all our CLI needs!
+
+
 Installation:
 ---
 
